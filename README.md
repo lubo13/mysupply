@@ -51,5 +51,5 @@ Asus – i7, Quadcore 2,1 GHz, Ultra HD, 8 GB RAM, energy star 80 certified – 
 4. edit .env file and change DATABASE_URL with your respective settings
 5. Execute: php bin/console doctrine:database:create
 6. Execute: php bin/console doctrine:migration:migrate
-7. Execute: php bin/console doctrine:fixtures:load 
+7. Execute: php bin/console doctrine:fixtures:load -e dev
 8. Go to project in browser
