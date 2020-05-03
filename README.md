@@ -10,7 +10,7 @@ In the second step, the customer can accept, or reject submitted Proposals.
 In the third step, the customer can start a negotiation with the accepted Proposals, in which the suppliers can submit bids. 
 When the negotiation has finished, the customer can award the best Proposals for his demand. 
 
-###How does the customer evaluate the best proposal? 
+### How does the customer evaluate the best proposal? 
 Often, the price is not the sole factor to determine the best Proposal. Instead the customer wants to apply Evaluation Criteria to his request and score each Proposal individually. 
 
 To do so, each Request has at least the default ‘Price’ Evaluation Criterion that is added automatically. 
