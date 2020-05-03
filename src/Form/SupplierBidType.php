@@ -29,8 +29,8 @@ class SupplierBidType extends AbstractType implements ServiceSubscriberInterface
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('contracts')
-            ->add('price');
+            ->add('contracts', null, ['help' => 'contract'])
+            ->add('price', null, ['label' => 'total_price']);
         $builder->addEventSubscriber($this->locator->get(SupplierBidTypeSubscriber::class));
     }
 
