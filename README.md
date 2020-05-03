@@ -1,6 +1,6 @@
-#Recruiting task 
+# Recruiting task 
 
-##Background 
+## Background 
 
 ##### XXXXXXXX is a digital negotiation SaaS platform which our customers can use for their procurement of products. 
 In the first step of the procurement process, a customer can create a Request For Proposal for his product demand and the system will find matching suppliers. The matching suppliers can submit a Proposal. 
