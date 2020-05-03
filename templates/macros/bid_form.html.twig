@@ -1,0 +1,28 @@
+{% macro renderBidFrom(form, supplierProposalId) %}
+    <div class="form-bid" id="div-form-bid{{ supplierProposalId }}">
+        {{ form_start(form, { 'method': 'POST', 'attr': {'id': 'form-bid' ~ supplierProposalId }}) }}
+        {{ form_errors(form) }}
+        {{ form_row(form) }}
+        <a class="btn btn-primary submit-bid" data-supplier-proposal-id="{{ supplierProposalId }}"
+           data-url="{{ path('app_admin_supplier_bid_new', {'_locale': app.request.locale, 'proposalId': supplierProposalId}) }}">
+            {{ 'add_bid'|trans }}
+        </a>
+        {{ form_end(form) }}
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".submit-bid").click(function () {
+                var url = $(this).data('url');
+                var proposalId = $(this).data('supplier-proposal-id');
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: $("#form-bid" + proposalId).serialize(),
+                    success: function (data) {
+                        $("#div-form-bid" + proposalId).html(data);
+                    }
+                });
+            });
+        });
+    </script>
+{% endmacro %}

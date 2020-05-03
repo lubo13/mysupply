@@ -1,0 +1,31 @@
+easy_admin:
+  site_name: 'Mysupply'
+  design:
+    menu:
+      - { entity: 'Request', permission: 'ROLE_CUSTOMER'}
+      - { entity: 'Proposal', permission: 'ROLE_SUPPLIER' }
+
+  disabled_actions: ['search']
+  entities:
+    Request:
+      class: App\Entity\CustomerRequest
+      controller: App\Controller\CustomRequestAdminController
+      filters: []
+      list:
+        fields: [id, description, category, evaluationCriterias, supplierProposals, createdAt]
+        actions: ['show']
+      show:
+        fields:
+          - { property: 'id' }
+          - { property: 'description' }
+          - { property: 'category' }
+          - { property: 'evaluationCriterias' }
+          - { property: 'supplierProposals', template: 'field/supplier_proposal.html.twig' }
+          - { property: 'createdAt' }
+    Proposal:
+      class: App\Entity\SupplierProposal
+      controller: App\Controller\SupplierProposalAdminController
+      disabled_actions: ['delete']
+      list:
+        actions: ['show']
+      edit: ['points']

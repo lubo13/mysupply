@@ -1,0 +1,157 @@
+{# a *-to-many collection of values #}
+{% if value is iterable %}
+    {% if 'show' == view %}
+        {% if value|length > 0 %}
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col" style="width:  30%">{{ 'decription'|trans }}</th>
+                    <th scope="col" style="width:  30%">{{ 'evaluation_scores'|trans }}</th>
+                    <th scope="col" style="width:  5%">{{ 'points'|trans }}</th>
+                    <th scope="col" style="width:  5%">{{ 'accepted'|trans }}</th>
+                    <th scope="col" style="width:  30%">{{ 'bids'|trans }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <p id="set-points-error"></p>
+                {% for item in value|slice(0, entity_config.show.max_results) %}
+                    <tr>
+                        <td>{{ item.description }}</td>
+                        <td>
+                            {% for score in item.evaluationScores %}
+                                {{ score.evaluationCriteria.name ~ ' -> ' ~ score.description }} <br>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% if item.points %}
+                                {{ item.points }}
+                            {% else %}
+                                <select class="form-control set-points" data-id="{{ item.id }}">
+                                    {% for num in 1..100 %}
+                                        <option>{{ num }}</option>
+                                    {% endfor %}
+                                </select>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.accepted is not null %}
+                                {% if item.accepted == 0 %}
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                {% else %}
+                                    <i class="fa fa-check" aria-hidden="true"></i>
+                                {% endif %}
+                            {% else %}
+                                {% set url =  url('proposal_xml_edit', {'entity': 'Proposal', 'action': 'edit', 'property': 'accepted', 'id': item.id,'value': 1 }) %}
+                                <button class="btn-acceptance btn btn-success" data-url="{{ url }}">
+                                    {{ 'accept'|trans }}
+                                </button>
+                                {% set url = url('proposal_xml_edit', {'entity': 'Proposal', 'action': 'edit', 'property': 'accepted', 'id': item.id,'value': 0 }) %}
+                                <button class="btn-acceptance btn btn-danger" data-url="{{ url }}">
+                                    {{ 'decline'|trans }}
+                                </button>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.bids|length == 0 %}
+                                {% if item.accepted is null %}
+                                    {{ 'should_accept_proposal'|trans }}
+                                {% elseif item.accepted == 0 %}
+                                    {{ 'decline_proposal'|trans }}
+                                {% endif %}
+                            {% endif %}
+                            {% for bid in item.bids %}
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <td>
+                                            {{ 'contract'|trans }}
+                                        </td>
+                                        <td>
+                                            {{ bid.contracts }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            {{ 'total_price'|trans }}
+                                        </td>
+                                        <td>
+                                            {{ bid.price }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        {% if bid.accepted is null %}
+                                            <td>
+                                                {% set url = url('app_admin_supplier_bid_edit', {'property': 'accepted', 'id': bid.id,'value': 1 }) %}
+                                                <button class="btn-acceptance btn btn-success" data-url="{{ url }}">
+                                                    {{ 'accept'|trans }}
+                                                </button>
+                                            </td>
+                                            <td>
+                                                {% set url = url('app_admin_supplier_bid_edit', {'property': 'accepted', 'id': bid.id,'value': 0 }) %}
+                                                <button class="btn-acceptance btn btn-danger" data-url="{{ url }}">
+                                                    {{ 'decline'|trans }}
+                                                </button>
+                                            </td>
+                                        {% else %}
+                                            <td colspan="2" class="text-center">
+                                                {% if bid.accepted == 0 %}
+                                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                                {% else %}
+                                                    <i class="fa fa-check" aria-hidden="true"></i>
+                                                {% endif %}
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                </table>
+
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="empty collection-empty">
+                {{ include(entity_config.templates.label_empty) }}
+            </div>
+        {% endif %}
+    {% elseif 'list' == view %}
+        <span class="badge badge-secondary">{{ value|length }}</span>
+    {% endif %}
+    {# a simple *-to-one value associated with an entity managed by this backend #}
+{% elseif link_parameters is defined %}
+    <a href="{{ path('easyadmin', link_parameters|merge({ referer: '' })) }}">{{ value|easyadmin_truncate }}</a>
+{% else %}
+    {{ value|easyadmin_truncate }}
+{% endif %}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".set-points").change(function () {
+            var url = new URL("{{ url('proposal_xml_edit', {'entity': 'Proposal', 'action': 'edit', 'property': 'points', })|raw }}");
+            url.searchParams.append('value', this.value);
+            url.searchParams.append('id', $(this).data('id'));
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (data) {
+                    location.reload();
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    $("#set-points-error").html(xhr.responseText);
+                }
+            });
+        });
+        $(".btn-acceptance").click(function () {
+            var url = $(this).data('url');
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (data) {
+                    location.reload();
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    $("#set-points-error").html(xhr.responseText);
+                }
+            });
+        });
+    });
+</script>

@@ -1,0 +1,194 @@
+{% extends '@EasyAdmin/default/show.html.twig' %}
+
+{% import "macros/bid_form.html.twig" as bidFrom %}
+
+ {% block show_fields %}
+     <div class="form-group ">
+         <label class="control-label">
+             {{ 'ID'|trans }}
+         </label>
+         <div class="form-widget">
+             <div class="form-control">
+                 {{ entity.id }}
+             </div>
+         </div>
+     </div>
+     <div class="form-group ">
+         <label class="control-label">
+             {{ 'decription'|trans }}
+         </label>
+         <div class="form-widget">
+             <div class="form-control">
+                 {{ entity.description }}
+             </div>
+         </div>
+     </div>
+     <div class="form-group ">
+         <label class="control-label">
+             {{ 'evaluation_criterias'|trans }}
+         </label>
+         <div class="form-widget">
+             <div class="form-control">
+                 <table class="table">
+                     <tbody>
+                     {% for evaluationCriteria in entity.evaluationCriterias %}
+                         <tr>
+                             <td>
+                                 {{ evaluationCriteria.name }}
+                             </td>
+                             <td>
+                                 {{ evaluationCriteria.weight ~ '%' }}
+                             </td>
+                         </tr>
+                     {% endfor %}
+                     </tbody>
+                 </table>
+             </div>
+         </div>
+     </div>
+     <div class="form-group ">
+         <label class="control-label">
+             {{ 'supplier_proposal'|trans }}
+         </label>
+         <div class="form-widget">
+             <div class="form-control">
+                 <table class="table table-bordered">
+                     <tbody>
+                     {% set ownProp = 0 %}
+                     {% for supplierProposal in entity.supplierProposals %}
+                         {% if supplierProposal.user.id == app.user.id %}
+                             {% set ownProp = ownProp + 1 %}
+                             {% set supplierProposalCount = (supplierProposal.evaluationScores)|length %}
+                             <tr>
+                                 <td>
+                                     {{ 'decription'|trans }}
+                                 </td>
+                                 <td colspan="{{ supplierProposalCount }}">
+                                     {{ supplierProposal.description }}
+                                 </td>
+                             </tr>
+                             <tr>
+                                 <td>
+                                     {{ 'accepted'|trans }}
+                                 </td>
+                                 <td colspan="{{ supplierProposalCount }}">
+                                     {% if supplierProposal.accepted is null %}
+                                         {{ 'in_process'|trans }}
+                                     {% elseif supplierProposal.accepted == 0 %}
+                                         <i class="fa fa-times" aria-hidden="true"></i>
+                                     {% elseif supplierProposal.accepted == 1 %}
+                                         <i class="fa fa-check" aria-hidden="true"></i>
+                                     {% endif %}
+                                 </td>
+                             </tr>
+                             <tr>
+                                 <td>
+                                     {{ 'evaluation_scores'|trans }}
+                                 </td>
+                                 {% for evaluationScore in supplierProposal.evaluationScores %}
+                                     <td>
+                                         {{ evaluationScore.evaluationCriteria.name ~ ': ' ~ evaluationScore.description }}
+                                     </td>
+                                 {% endfor %}
+                             </tr>
+                             {% if supplierProposal.bids|length > 0 %}
+                                 <tr>
+                                     <td>
+                                         {{ 'supplier_bids'|trans }}
+                                     </td>
+                                     <td colspan="{{ supplierProposalCount }}">
+                                         <table class="table table-bordered">
+                                             <tbody>
+                                             {% set showForm = 1 %}
+                                             {% for bid in supplierProposal.bids %}
+                                                 {% if bid.accepted == 1 or bid.accepted is null %}
+                                                     {% set showForm = 0 %}
+                                                 {% endif %}
+                                                 <tr>
+                                                     <td>
+                                                         {{ 'contract'|trans }}
+                                                     </td>
+                                                     <td>
+                                                         {{ bid.contracts }}
+                                                     </td>
+                                                 </tr>
+                                                 <tr>
+                                                     <td>
+                                                         {{ 'total_price'|trans }}
+                                                     </td>
+                                                     <td>
+                                                         {{ bid.price }}
+                                                     </td>
+                                                 </tr>
+                                                 <tr>
+                                                     <td>
+                                                         {{ 'accepted'|trans }}
+                                                     </td>
+                                                     <td class="text-center">
+                                                         {% if bid.accepted is null %}
+                                                             {{ 'in_process'|trans }}
+                                                         {% elseif bid.accepted == 0 %}
+                                                             <i class="fa fa-times" aria-hidden="true"></i>
+                                                         {% elseif bid.accepted == 1 %}
+                                                             <i class="fa fa-check" aria-hidden="true"></i>
+                                                         {% endif %}
+                                                     </td>
+                                                 </tr>
+                                             {% endfor %}
+                                             </tbody>
+                                         </table>
+                                     </td>
+
+                                 </tr>
+                                 {% if showForm == 1 %}
+                                     <tr>
+                                         <td>
+                                             {{ 'add_bid'|trans }}
+                                         </td>
+                                         <td colspan="{{ supplierProposalCount }}">
+                                             {{ bidFrom.renderBidFrom(bidForm, supplierProposal.id) }}
+                                         </td>
+                                     </tr>
+                                 {% endif %}
+                             {% elseif supplierProposal.accepted == 1 %}
+                                 <tr>
+                                     <td>
+                                         {{ 'add_bid'|trans }}
+                                     </td>
+                                     <td colspan="{{ supplierProposalCount }}">
+                                         {{ bidFrom.renderBidFrom(bidForm, supplierProposal.id) }}
+                                     </td>
+                                 </tr>
+                             {% endif %}
+                         {% endif %}
+                     {% endfor %}
+                     {% if ownProp == 0 %}
+                         <tr>
+                             <td>
+                                 {{ 'have_not_own_proposal'|trans }}
+                             </td>
+                         </tr>
+                     {% endif %}
+                     </tbody>
+                 </table>
+             </div>
+         </div>
+     </div>
+ {% endblock %}
+
+{% block item_actions %}
+    {% set _show_actions = easyadmin_get_actions_for_show_item(_entity_config.name) %}
+    {% set _request_parameters = app.request.query.all %}
+
+    {% set _show_actions = {'list': _show_actions['list'] } %}
+
+    {{ include('@EasyAdmin/default/includes/_actions.html.twig', {
+        actions: _show_actions,
+        entity_config: _entity_config,
+        request_parameters: _request_parameters,
+        translation_domain: _entity_config.translation_domain,
+        trans_parameters: _trans_parameters,
+        item_id: _entity_id,
+        item: entity
+    }, with_context = false) }}
+{% endblock item_actions %}

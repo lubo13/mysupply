@@ -1,0 +1,34 @@
+{% extends '@EasyAdmin/default/new.html.twig' %}
+
+{% block main %}
+    <div class="text-center">
+        <table class="table">
+            <tbody>
+            <tr>
+                <td colspan="2">
+                    {{ customerRequest.description }}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    {{ 'evaluation_criterias'|trans }}
+                </td>
+            </tr>
+            {% for evaluationCriteria in customerRequest.evaluationCriterias %}
+                <tr>
+                    <td>
+                        {{ evaluationCriteria.name }}
+                    </td>
+                    <td>
+                        {{ evaluationCriteria.weight ~ '%' }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% block entity_form %}
+        {{ form(form) }}
+    {% endblock entity_form %}
+{% endblock %}
