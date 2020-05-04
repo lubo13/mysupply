@@ -1,7 +1,7 @@
 <?php
 /**
  * @package Mysypply_App
- * @author  Stenik Symfony Team <symfony@stenik.bg>
+ * @author  Lubo Grozdanov <grozdanov.lubo@gmail.com>
  */
 
 namespace App\Utils;
