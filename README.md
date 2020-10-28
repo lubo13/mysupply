@@ -45,7 +45,7 @@ Asus – i7, Quadcore 2,1 GHz, Ultra HD, 8 GB RAM, energy star 80 certified – 
 7. Login with supplier and view results
 
 ## Installation
-1. git clone git@bitbucket.org:Lubo13/mysupply.git
+1. git clone git@github.com:lubo13/mysupply.git
 2. cd mysupply
 3. composer install
 4. edit .env file and change DATABASE_URL with your respective settings
